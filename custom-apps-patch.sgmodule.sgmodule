@@ -1,0 +1,95 @@
+#!name = 自定义补丁 - 常用应用国家分流
+#!desc = Instagram/Threads/FB→KR / TikTok→JP / Telegram→SG / Spotify/Himalaya→HK / AI+YouTube/Google→US / 台湾独占→TW
+#!author = Custom Patch
+#!version = 2026.01.04
+#!homepage = https://example.com
+
+[Rule]
+# 1. Meta 系（Instagram / Threads / Facebook） → 韩国
+DOMAIN-SUFFIX, instagram.com, KR Group
+DOMAIN-SUFFIX, instagramusercontent.com, KR Group
+DOMAIN-SUFFIX, cdninstagram.com, KR Group
+DOMAIN-SUFFIX, threads.net, KR Group
+DOMAIN-SUFFIX, facebook.com, KR Group
+DOMAIN-SUFFIX, fb.com, KR Group
+DOMAIN-SUFFIX, fbcdn.net, KR Group
+DOMAIN-SUFFIX, meta.com, KR Group
+DOMAIN-KEYWORD, instagram, KR Group
+DOMAIN-KEYWORD, threads, KR Group
+
+# 2. TikTok 国际版 → 日本
+DOMAIN-SUFFIX, tiktok.com, JP Group
+DOMAIN-SUFFIX, tiktokcdn.com, JP Group
+DOMAIN-SUFFIX, tiktokv.com, JP Group
+DOMAIN-SUFFIX, byteoversea.com, JP Group
+DOMAIN-SUFFIX, ibytedtos.com, JP Group
+DOMAIN-SUFFIX, musical.ly, JP Group
+DOMAIN-SUFFIX, snssdk.com, JP Group
+DOMAIN-KEYWORD, tiktok, JP Group
+
+# 3. Telegram → 新加坡
+DOMAIN-SUFFIX, telegram.org, SG Group
+DOMAIN-SUFFIX, t.me, SG Group
+DOMAIN-SUFFIX, tdesktop.com, SG Group
+DOMAIN-SUFFIX, telegra.ph, SG Group
+DOMAIN-SUFFIX, telegram.me, SG Group
+
+# 4. Spotify → 香港
+DOMAIN-SUFFIX, spotify.com, HK Group
+DOMAIN-SUFFIX, scdn.co, HK Group
+DOMAIN-SUFFIX, spoti.fi, HK Group
+DOMAIN-SUFFIX, spotilocal.com, HK Group
+
+# 5. Himalaya 喜马拉雅（国际版） → 香港
+DOMAIN-SUFFIX, ximalaya.com, HK Group
+DOMAIN-SUFFIX, himalaya.com, HK Group
+DOMAIN-SUFFIX, xmcdn.com, HK Group
+DOMAIN-SUFFIX, xmcnd.com, HK Group
+DOMAIN-SUFFIX, xdcdn.com, HK Group
+DOMAIN-KEYWORD, ximalaya, HK Group
+DOMAIN-KEYWORD, himalaya, HK Group
+
+# 6. 非大陆 AI 服务 + OpenAI/ChatGPT + YouTube/Google → 美国
+DOMAIN-SUFFIX, openai.com, US Group
+DOMAIN-SUFFIX, chatgpt.com, US Group
+DOMAIN-SUFFIX, api.openai.com, US Group
+DOMAIN-SUFFIX, oaiusercontent.com, US Group
+DOMAIN-SUFFIX, anthropic.com, US Group
+DOMAIN-SUFFIX, claude.ai, US Group
+DOMAIN-SUFFIX, gemini.google.com, US Group
+DOMAIN-SUFFIX, ai.google.dev, US Group
+DOMAIN-SUFFIX, youtube.com, US Group
+DOMAIN-SUFFIX, ytimg.com, US Group
+DOMAIN-SUFFIX, youtu.be, US Group
+DOMAIN-SUFFIX, ggpht.com, US Group
+DOMAIN-SUFFIX, google.com, US Group
+DOMAIN-SUFFIX, googleapis.com, US Group
+DOMAIN-SUFFIX, gstatic.com, US Group
+DOMAIN-SUFFIX, googleusercontent.com, US Group
+DOMAIN-KEYWORD, openai, US Group
+DOMAIN-KEYWORD, chatgpt, US Group
+DOMAIN-KEYWORD, claude, US Group
+DOMAIN-KEYWORD, gemini, US Group
+
+# 7. 常用独属台湾地区的应用 → 台湾（示例域名，实际可根据需要补充）
+# 常见台湾独占：myvideo.net.tw, friDay.com, kknews.cc, ettoday.net 等
+DOMAIN-SUFFIX, myvideo.net.tw, TW Group
+DOMAIN-SUFFIX, friday.tw, TW Group
+DOMAIN-SUFFIX, kknews.cc, TW Group
+DOMAIN-SUFFIX, ettoday.net, TW Group
+DOMAIN-SUFFIX, nownews.com, TW Group
+DOMAIN-SUFFIX, gvm.com.tw, TW Group
+DOMAIN-SUFFIX, ltn.com.tw, TW Group
+DOMAIN-KEYWORD, myvideo, TW Group
+DOMAIN-KEYWORD, friday, TW Group
+
+#!mitm
+# 解密白名单（只对需要 MITM 的域名开启解密，避免全局影响）
+hostname = 
+  *.instagram.com, *.threads.net, *.facebook.com, *.meta.com,
+  *.tiktok.com, *.tiktokcdn.com, *.byteoversea.com,
+  *.telegram.org, *.t.me, *.tdesktop.com,
+  *.spotify.com, *.scdn.co,
+  *.ximalaya.com, *.himalaya.com,
+  *.openai.com, *.chatgpt.com, *.youtube.com, *.google.com, *.googleapis.com,
+  *.myvideo.net.tw, *.friday.tw, *.kknews.cc, *.ettoday.net
