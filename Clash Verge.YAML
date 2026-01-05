@@ -1,0 +1,311 @@
+# Clash Meta 配置 - 基于 Shadowrocket 自用 (2).conf 风格
+# 生成日期: 2026-01-05
+# 使用方法: 在 Clash Verge Rev 中新建/导入此 YAML 文件 → 添加你的节点订阅
+
+mixed-port: 7890
+allow-lan: true
+mode: rule
+log-level: info
+external-controller: 127.0.0.1:9090
+secret: ""
+
+dns:
+  enable: true
+  ipv6: false
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  nameserver:
+    - https://dns.google/dns-query
+    - https://cloudflare-dns.com/dns-query
+    - tls://1.1.1.1:853
+    - system
+  fallback:
+    - 223.5.5.5
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    ipcidr:
+      - 240.0.0.0/4
+
+proxies: []
+  # ← 这里留空，请通过订阅或手动添加你的节点
+  # 示例格式：
+  # - name: "🇭🇰 香港 06"
+  #   type: vmess
+  #   server: example.com
+  #   port: 443
+  #   uuid: xxxxx
+  #   alterId: 0
+  #   cipher: auto
+  #   tls: true
+
+proxy-groups:
+  - name: 全球加速
+    type: select
+    proxies:
+      - 自动选择
+      - DIRECT
+      - REJECT
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 狮城节点
+      - 美国节点
+      - 韩国节点
+
+  - name: 苹果服务
+    type: select
+    proxies:
+      - DIRECT
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 狮城节点
+      - 日本节点
+      - 美国节点
+      - 韩国节点
+
+  - name: 哔哩哔哩
+    type: select
+    proxies:
+      - DIRECT
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 狮城节点
+      - 日本节点
+      - 美国节点
+      - 韩国节点
+
+  - name: 自动选择
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    proxies:
+      - 香港节点  # 假设你的节点订阅包含这些名称
+      - 台湾节点
+      - 日本节点
+      - 狮城节点
+      - 美国节点
+      - 韩国节点
+
+  - name: 香港节点
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 600
+    tolerance: 50
+    proxies: []  # 自动匹配名称含 香港|港|HK|Hong 的节点
+
+  - name: 台湾节点
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 600
+    tolerance: 50
+    proxies: []  # 匹配 台|TW|Taiwan
+
+  - name: 韩国节点
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 600
+    tolerance: 50
+    proxies: []  # 匹配 KR|Korea|韩国 等
+
+  - name: 日本节点
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 600
+    tolerance: 50
+    proxies: []  # 匹配 日|JP|Japan
+
+  - name: 狮城节点
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 600
+    tolerance: 50
+    proxies: []  # 匹配 新|狮|SG|Singapore
+
+  - name: 美国节点
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 600
+    tolerance: 50
+    proxies: []  # 匹配 美|US|States|American
+
+rule-providers:
+  # blackmatrix7 规则集（Clash 格式直接可用）
+  WeChat:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/WeChat/WeChat.yaml
+    path: ./ruleset/WeChat.yaml
+    interval: 86400
+
+  Apple:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Apple/Apple.yaml
+    path: ./ruleset/Apple.yaml
+    interval: 86400
+
+  BiliBili:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/BiliBili/BiliBili.yaml
+    path: ./ruleset/BiliBili.yaml
+    interval: 86400
+
+  ChinaMedia:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/ChinaMedia/ChinaMedia.yaml
+    path: ./ruleset/ChinaMedia.yaml
+    interval: 86400
+
+  Gemini:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Gemini/Gemini.yaml
+    path: ./ruleset/Gemini.yaml
+    interval: 86400
+
+  OpenAI:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/OpenAI/OpenAI.yaml
+    path: ./ruleset/OpenAI.yaml
+    interval: 86400
+
+  GitHub:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GitHub/GitHub.yaml
+    path: ./ruleset/GitHub.yaml
+    interval: 86400
+
+  Facebook:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Facebook/Facebook.yaml
+    path: ./ruleset/Facebook.yaml
+    interval: 86400
+
+  Google:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Google/Google.yaml
+    path: ./ruleset/Google.yaml
+    interval: 86400
+
+  Instagram:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Instagram/Instagram.yaml
+    path: ./ruleset/Instagram.yaml
+    interval: 86400
+
+  Spotify:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Spotify/Spotify.yaml
+    path: ./ruleset/Spotify.yaml
+    interval: 86400
+
+  YouTube:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/YouTube/YouTube.yaml
+    path: ./ruleset/YouTube.yaml
+    interval: 86400
+
+  Whatsapp:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Whatsapp/Whatsapp.yaml
+    path: ./ruleset/Whatsapp.yaml
+    interval: 86400
+
+  Twitter:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Twitter/Twitter.yaml
+    path: ./ruleset/Twitter.yaml
+    interval: 86400
+
+  Threads:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Threads/Threads.yaml
+    path: ./ruleset/Threads.yaml
+    interval: 86400
+
+  Telegram:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Telegram/Telegram.yaml
+    path: ./ruleset/Telegram.yaml
+    interval: 86400
+
+  TikTok:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/TikTok/TikTok.yaml
+    path: ./ruleset/TikTok.yaml
+    interval: 86400
+
+  GlobalMedia:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GlobalMedia/GlobalMedia.yaml
+    path: ./ruleset/GlobalMedia.yaml
+    interval: 86400
+
+  Lan:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Lan/Lan.yaml
+    path: ./ruleset/Lan.yaml
+    interval: 86400
+
+rules:
+  # 高频规则前置
+  - RULE-SET,WeChat,DIRECT
+  - RULE-SET,Apple,苹果服务
+  - RULE-SET,BiliBili,哔哩哔哩
+  - RULE-SET,ChinaMedia,DIRECT
+
+  # 自定义 OR 规则（Clash 无原生 OR，拆分成多条）
+  - DOMAIN-KEYWORD,wogg,DIRECT
+  - DOMAIN-SUFFIX,iios.club,DIRECT
+  - DOMAIN-SUFFIX,shuibeng.dpdns.org,DIRECT
+
+  - DOMAIN-SUFFIX,vercel.app,香港节点
+  - DOMAIN-KEYWORD,haijiao,香港节点
+
+  # AI 美国 + 狮城 fallback
+  - RULE-SET,Gemini,美国节点
+  - RULE-SET,OpenAI,美国节点
+  - RULE-SET,iab0x00_AI,美国节点  # 注意：外部 AI.txt 需要手动转换为 rule-provider 或本地文件
+
+  # 其他常用服务
+  - RULE-SET,GitHub,香港节点
+  - RULE-SET,Facebook,韩国节点
+  - RULE-SET,Google,美国节点
+  - RULE-SET,Instagram,韩国节点
+  - RULE-SET,Spotify,香港节点
+  - RULE-SET,YouTube,美国节点
+  - RULE-SET,Whatsapp,韩国节点
+  - RULE-SET,Twitter,美国节点
+  - RULE-SET,Threads,韩国节点
+  - RULE-SET,Telegram,狮城节点
+  - RULE-SET,TikTok,日本节点
+
+  # GlobalMedia 统一走全球加速
+  - RULE-SET,GlobalMedia,全球加速
+
+  # 局域网 & CN
+  - RULE-SET,Lan,DIRECT
+  - GEOIP,CN,DIRECT
+
+  # 兜底
+  - MATCH,全球加速
