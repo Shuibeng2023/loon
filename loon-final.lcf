@@ -1,58 +1,148 @@
-# Loon - 2026-01-05 最终版
+# Loon 自动配置 - 优化版 2026-01-05
+# 原作者: https://t.me/iKeLee
+# 优化: 语法修复 + App Store 加速 + AI fallback + TG 转圈备选方案
 
 [General]
-skip-proxy = 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12, localhost, *.local
-tun-excluded-routes = 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12, 224.0.0.0/4, localhost, *.local
-ipv6 = false
-dns-server = system, https://dns.google/dns-query, https://cloudflare-dns.com/dns-query
-fallback-dns-server = 223.5.5.5
-check-url = http://www.gstatic.com/generate_204
+# DNS 设置保持原样
+doh3-server = https://dns.alidns.com/dns-query
+hijack-dns = 8.8.8.8:53,1.1.1.1:53
+mitm-on-wifi-access = true
+ipv6-vif = off
+ip-mode = prefer-v4
+dns-server = system,8.8.8.8
+sni-sniffing = true
+disable-stun = true
+dns-reject-mode = LoopbackIP
+domain-reject-mode = DNS
+udp-fallback-mode = REJECT
+wifi-access-http-port = 7222
+wifi-access-socks5-port = 7221
+allow-wifi-access = false
+interface-mode = auto
+test-timeout = 4
+disconnect-on-policy-change = true
+switch-node-after-failure-times = 2
+internet-test-url = http://connectivitycheck.platform.hicloud.com/generate_204
+proxy-test-url = http://www.gstatic.com/generate_204
+resource-parser = https://raw.githubusercontent.com/sub-store-org/Sub-Store/release/sub-store-parser.loon.min.js
+geoip-url = https://geodata.kelee.one/Country-Masaiki.mmdb
+ipasn-url = https://geodata.kelee.one/GeoLite2-ASN-P3TERX.mmdb
+
+# 修复 skip-proxy：去掉末尾逗号、无空格
+skip-proxy = 192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,localhost,*.local,e.crashlynatics.com
+
+# bypass-tun 增加 CGNAT 段（常见漏网）
+bypass-tun = 10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,192.0.0.0/24,192.0.2.0/24,192.88.99.0/24,192.168.0.0/16,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,255.255.255.255/32,192.168.43.0/24
 
 [Proxy]
-# 替换为你的真实节点订阅
-香港节点 = url-test, tag=香港节点, url=http://www.gstatic.com/generate_204, interval=600, tolerance=50, timeout=5, policy-regex=香港|港|HK|🇭🇰|Hong
-台湾节点 = url-test, tag=台湾节点, url=http://www.gstatic.com/generate_204, interval=600, tolerance=50, timeout=5, policy-regex=台|TW|Taiwan|台湾
-日本节点 = url-test, tag=日本节点, url=http://www.gstatic.com/generate_204, interval=600, tolerance=50, timeout=5, policy-regex=日|JP|Japan|日本
-狮城节点 = url-test, tag=狮城节点, url=http://www.gstatic.com/generate_204, interval=600, tolerance=50, timeout=5, policy-regex=新|狮|SG|Singapore|新加坡
-美国节点 = url-test, tag=美国节点, url=http://www.gstatic.com/generate_204, interval=600, tolerance=50, timeout=5, policy-regex=美|US|States|American|美国
-韩国节点 = url-test, tag=韩国节点, url=http://www.gstatic.com/generate_204, interval=600, tolerance=50, timeout=5, policy-regex=KR|Korea|韩国|首尔|🇰🇷
+[Remote Proxy]
+HW = https://gist.githubusercontent.com/Shuibeng2023/2cafa73a6a82b771c40214700eece301/raw/HW,udp=true,block-quic=true,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=false,flexible-sni=false,img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/Urltest.png
+优选聚合 = https://gist.githubusercontent.com/Shuibeng2023/2cafa73a6a82b771c40214700eece301/raw/Loon,udp=true,block-quic=true,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=true,flexible-sni=false,img-url=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Cloudflare.png
 
-自动选择 = url-test, tag=自动选择, url=http://www.gstatic.com/generate_204, interval=300, tolerance=50, timeout=5, policy-regex=^(?!.*(故障|过期|剩余|到期)).*$
+[Remote Filter]
+香港节点 = NameRegex, FilterKey = "^(?=.*((?i)🇭🇰|香港|(\b(HK|HKG|Hong)(\d+)?\b)))(?!.*((?i)回国|校园|游戏|🎮|(\b(GAME)\b))).*$"
+台湾节点 = NameRegex, FilterKey = "^(?=.*((?i)🇹🇼|台湾|(\b(TW|TWN|Tai|Taiwan)(\d+)?\b)))(?!.*((?i)回国|校园|游戏|🎮|(\b(GAME)\b))).*$"
+日本节点 = NameRegex, FilterKey = "^(?=.*((?i)🇯🇵|日本|川日|东京|大阪|泉日|埼玉|(\b(JP|JPN|Japan)(\d+)?\b)))(?!.*((?i)回国|校园|游戏|🎮|(\b(GAME)\b))).*$"
+韩国节点 = NameRegex, FilterKey = "^(?=.*((?i)🇰🇷|韩国|韓|首尔|(\b(KR|KOR|Korea)(\d+)?\b)))(?!.*((?i)回国|校园|游戏|🎮|(\b(GAME)\b))).*$"
+新国节点 = NameRegex, FilterKey = "^(?=.*((?i)🇸🇬|新加坡|狮|(\b(SG|SGP|Singapore)(\d+)?\b)))(?!.*((?i)回国|校园|游戏|🎮|(\b(GAME)\b))).*$"
+美国节点 = NameRegex, FilterKey = "^(?=.*((?i)🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|(\b(US|USA|United States)(\d+)?\b)))(?!.*((?i)回国|校园|游戏|🎮|(\b(GAME)\b))).*$"
+全球节点 = NameRegex, FilterKey = "^(?=.*(.))(?!.*((?i)群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|(\b(USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic)(\d+)?\b|(\d{4}-\d{2}-\d{2}|\dG)))).*$"
 
 [Proxy Group]
-全球加速 = select, 自动选择, 香港节点, 台湾节点, 日本节点, 狮城节点, 美国节点, 韩国节点, tag=全球加速
-苹果服务 = select, DIRECT, 自动选择, 香港节点, 台湾节点, 狮城节点, 日本节点, 美国节点, 韩国节点, tag=苹果服务
-哔哩哔哩 = select, DIRECT, 自动选择, 香港节点, 台湾节点, 狮城节点, 日本节点, 美国节点, 韩国节点, tag=哔哩哔哩
+YouTube = select,香港手动策略,香港时延优选,台湾时延优选,日本时延优选,韩国时延优选,新国时延优选,美国时延优选,img-url = https://github.com/shindgewongxj/WHATSINStash/raw/main/icon/youtube.png
+Instagram = select,韩国手动策略,香港时延优选,台湾时延优选,日本时延优选,韩国时延优选,新国时延优选,美国时延优选,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/Instagram.png
+Google = select,美国手动策略,香港时延优选,台湾时延优选,日本时延优选,韩国时延优选,新国时延优选,美国时延优选,img-url = https://github.com/shindgewongxj/WHATSINStash/raw/main/icon/google.png
+
+# 优化：人工智能加 fallback（美国优先 → 香港/新国备选）
+人工智能 = select,美国手动策略,香港时延优选,新国时延优选,台湾时延优选,日本时延优选,韩国时延优选,美国时延优选,img-url = https://github.com/shindgewongxj/WHATSINStash/raw/main/icon/openai.png
+
+TikTok = select,日本手动策略,香港时延优选,台湾时延优选,日本时延优选,韩国时延优选,新国时延优选,美国时延优选,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/TikTok_1.png
+Telegram = select,新国手动策略,香港时延优选,台湾时延优选,日本时延优选,韩国时延优选,新国时延优选,美国时延优选,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Telegram.png
+Twitter = select,美国手动策略,香港时延优选,台湾时延优选,日本时延优选,韩国时延优选,新国时延优选,美国时延优选,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Twitter.png
+
+香港手动策略 = select,香港节点,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/HK.png
+台湾手动策略 = select,台湾节点,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/TW.png
+日本手动策略 = select,日本节点,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/JP.png
+韩国手动策略 = select,韩国节点,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/KR.png
+新国手动策略 = select,新国节点,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/SG.png
+美国手动策略 = select,美国节点,img-url = https://raw.githubusercontent.com/Orz-3/mini/master/Color/US.png
+
+兜底后备策略 = select,香港时延优选,台湾时延优选,日本时延优选,韩国时延优选,新国时延优选,美国时延优选,img-url = https://github.com/shindgewongxj/WHATSINStash/raw/main/icon/fallback.png
 
 [Rule]
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/WeChat/WeChat.list,DIRECT
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Apple/Apple.list,苹果服务
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/BiliBili/BiliBili.list,哔哩哔哩
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/ChinaMedia/ChinaMedia.list,DIRECT
+OR,((DOMAIN-SUFFIX,iios.club),(DOMAIN-SUFFIX,shuibeng.dpdns.org),(DOMAIN-KEYWORD,wogg)),DIRECT
 
-OR,((DOMAIN-KEYWORD,wogg),(DOMAIN-SUFFIX,iios.club),(DOMAIN-SUFFIX,shuibeng.dpdns.org)),DIRECT
+# 信息收集
+URL-REGEX,"\.log\.",REJECT
 
-OR,((DOMAIN-SUFFIX,vercel.app),(DOMAIN-KEYWORD,haijiao),(DOMAIN-SUFFIX,openai.com),(DOMAIN-SUFFIX,openaiusercontent.com),(DOMAIN-SUFFIX,chatgpt.com),(DOMAIN-SUFFIX,gemini.google.com),(DOMAIN-SUFFIX,googleapis.com),(DOMAIN-SUFFIX,anthropic.com),(DOMAIN-SUFFIX,claude.ai),(DOMAIN-SUFFIX,perplexity.ai),(DOMAIN-SUFFIX,grok.x.ai),(DOMAIN-SUFFIX,x.ai),(DOMAIN-KEYWORD,grok)),美国节点
+# 海角社区
+DOMAIN-KEYWORD,haijiao,兜底后备策略
 
-OR,((DOMAIN-SUFFIX,deepseek.com),(DOMAIN-KEYWORD,deepseek),(DOMAIN-SUFFIX,qwen.ai),(DOMAIN-SUFFIX,tongyi.aliyun.com),(DOMAIN-SUFFIX,wenxin.baidu.com)),DIRECT
+# App Store 下载加速补充（关键 CDN 强制 DIRECT）
+DOMAIN-SUFFIX,mzstatic.com,DIRECT
+DOMAIN-SUFFIX,mzedge.com,DIRECT
+DOMAIN-SUFFIX,aaplimg.com,DIRECT
+DOMAIN-SUFFIX,appldnld.apple.com,DIRECT
+DOMAIN-SUFFIX,appstore.com,DIRECT
 
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/GitHub/GitHub.list,香港节点
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Google/Google.list,美国节点
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/YouTube/YouTube.list,美国节点
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Instagram/Instagram.list,韩国节点
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Facebook/Facebook.list,韩国节点
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Twitter/Twitter.list,美国节点
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Telegram/Telegram.list,狮城节点
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/TikTok/TikTok.list,日本节点
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Spotify/Spotify.list,香港节点
+FINAL,兜底后备策略
 
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/GlobalMedia/GlobalMedia.list,全球加速
-GEOIP,CN,DIRECT
-FINAL,全球加速
+[Remote Rule]
+https://rule.kelee.one/Loon/WeChat.lsr, policy=DIRECT, tag=微信, enabled=true
+https://rule.kelee.one/Loon/Apple.lsr, policy=DIRECT, tag=Apple, enabled=true
+https://rule.kelee.one/Loon/Himalaya.lsr, policy=香港时延优选, tag=Himalaya, enabled=true
+https://rule.kelee.one/Loon/GitHub.lsr, policy=香港时延优选, tag=GitHub, enabled=true
+https://rule.kelee.one/Loon/YouTube.lsr, policy=YouTube, tag=YouTube, enabled=true
+https://rule.kelee.one/Loon/Twitter.lsr, policy=Twitter, tag=Twitter, enabled=true
+https://rule.kelee.one/Loon/Instagram.lsr, policy=Instagram, tag=Instagram, enabled=true
+https://rule.kelee.one/Loon/Threads.lsr, policy=Instagram, tag=Threads, enabled=true
+https://rule.kelee.one/Loon/Facebook.lsr, policy=Instagram, tag=Facebook, enabled=true
+https://rule.kelee.one/Loon/Spotify.lsr, policy=香港时延优选, tag=Spotify, enabled=true
+https://rule.kelee.one/Loon/Google.lsr, policy=Google, tag=Google, enabled=true
+https://rule.kelee.one/Loon/Telegram.lsr, policy=Telegram, tag=Telegram, enabled=true
+https://kelee.one/Tool/Loon/Lsr/TikTok.lsr, policy=TikTok, tag=TikTok, enabled=true
+https://kelee.one/Tool/Loon/Lsr/AI.lsr, policy=人工智能, tag=AI, enabled=true
+https://rule.kelee.one/Loon/ChinaMax.lsr, policy=DIRECT, tag=ChinaMax, enabled=true
+https://kelee.one/Tool/Loon/Lsr/LAN_SPLITTER.lsr, policy=DIRECT, tag=LAN, enabled=true
+https://kelee.one/Tool/Loon/Lsr/REGION_SPLITTER.lsr, policy=DIRECT, tag=CN REGION, enabled=true
+
+[Host]
+*.10086.cn = server:https://dns.alidns.com/dns-query
+*.weixin.qq.com,*.wx.qq.com,*.weixin.com = server:https://dns.alidns.com/dns-query
+iosapps.itunes.apple.com = hls.itunes.apple.com.mwcname.com
 
 [Rewrite]
-^https?://(www\.)?g\.cn$ https://www.google.com 302
-^https?://(www\.)?google\.cn$ https://www.google.com 302
+# 原有保持
 
-[MITM]
-hostname = *.google.cn, *.gstatic.com, *.google.com, *.googleapis.com
+[Script]
+[Remote Script]
+https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tasks.scripts, tag=奶思, enabled=true
+https://raw.githubusercontent.com/NobyDa/Script/master/Loon/Loon_Daily_bonus.plugin, tag=NobyDa, enabled=true
+https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/KuWoTask.lpx, tag=酷我签到, enabled=true
+
+[Plugin]
+http://script.hub/file/_start_/https://raw.githubusercontent.com/ClydeTime/Surge/main/Task/GetCookie.sgmodule/_end_/GetCookie.plugin?type=surge-module&target=loon-plugin&del=true&jqEnabled=true, enabled=false
+http://script.hub/file/_start_/https://raw.githubusercontent.com/ClydeTime/Quantumult/main/Task/GetCookie.sgmodule/_end_/GetCookie.plugin?type=surge-module&target=loon-plugin&del=true&jqEnabled=true, enabled=false
+https://loon.103516.xyz/Plugin/SkipProxy.lpx, enabled=true
+https://loon.103516.xyz/Plugin/Redirect.lpx, enabled=true
+https://loon.103516.xyz/Plugin/IPPure.lpx, enabled=true
+https://loon.103516.xyz/Plugin/Netisp-x.lpx, enabled=true
+https://loon.103516.xyz/Plugin/NodeTools.lpx, enabled=true
+https://loon.103516.xyz/Plugin/StreamingMedia.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Block_HTTPDNS.lpx, pin=true, enabled=false
+https://kelee.one/Tool/Loon/Lpx/BlockAdvertisers.lpx, pin=true, enabled=false
+https://kelee.one/Tool/Loon/Lpx/Prevent_DNS_Leaks.lpx, policy=香港时延优选, enabled=true
+https://loon.103516.xyz/Plugin/Swiftgram.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Weixin_external_links_unlock.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/QQ_Redirect.lpx, enabled=true
+https://loon.103516.xyz/Plugin/Sub-Store.lpx, policy=香港时延优选, enabled=true
+https://loon.103516.xyz/Plugin/BoxJs.lpx, policy=香港时延优选, enabled=true
+https://loon.103516.xyz/Plugin/Script-Hub.lpx, policy=香港时延优选, enabled=true
+
+[Mitm]
+ca-p12 = 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
+ca-passphrase = GAE563TF
+hostname =
+ca-p12=
+ca-passphrase=
+skip-server-cert-verify = false
