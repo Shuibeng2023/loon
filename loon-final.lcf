@@ -1,153 +1,58 @@
-# Loon 配置 - 2026年1月 自定义分流版（基于用户需求）
-# 与之前 Shadowrocket 保持相同分流逻辑
-# 微信 → DIRECT
-# 苹果全家桶 → DIRECT
-# 喜马拉雅/Himalaya + Spotify → HK Group
-# YouTube/Google/Twitter/X + 非大陆AI → US Group
-# Instagram/Threads/Facebook → KR Group
-# Telegram → SG Group
-# TikTok → JP Group
-# 国内 → DIRECT
-# 广告 → REJECT（轻量）
-# 兜底 → Proxy（主选择组）
+# Loon - 2026-01-05 最终版
 
 [General]
-# 基本设置（可根据需要调整）
-allow-udp-proxy = true
 skip-proxy = 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12, localhost, *.local
-bypass-tun = 10.0.0.0/8, 100.64.0.0/10, 127.0.0.0/8, 169.254.0.0/16, 172.16.0.0/12, 192.168.0.0/16
-dns-server = system, 8.8.8.8, 1.1.1.1
+tun-excluded-routes = 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12, 224.0.0.0/4, localhost, *.local
 ipv6 = false
+dns-server = system, https://dns.google/dns-query, https://cloudflare-dns.com/dns-query
+fallback-dns-server = 223.5.5.5
+check-url = http://www.gstatic.com/generate_204
 
 [Proxy]
-# ===================== 替换成你的真实节点 =====================
-HK1 = vmess, hk1.yourserver.com, 443, username=xxx, password=xxx, tls=true, ws=true, ws-path=/path
-HK2 = vmess, hk2.yourserver.com, 443, username=xxx, password=xxx, tls=true, ws=true
+# 替换为你的真实节点订阅
+香港节点 = url-test, tag=香港节点, url=http://www.gstatic.com/generate_204, interval=600, tolerance=50, timeout=5, policy-regex=香港|港|HK|🇭🇰|Hong
+台湾节点 = url-test, tag=台湾节点, url=http://www.gstatic.com/generate_204, interval=600, tolerance=50, timeout=5, policy-regex=台|TW|Taiwan|台湾
+日本节点 = url-test, tag=日本节点, url=http://www.gstatic.com/generate_204, interval=600, tolerance=50, timeout=5, policy-regex=日|JP|Japan|日本
+狮城节点 = url-test, tag=狮城节点, url=http://www.gstatic.com/generate_204, interval=600, tolerance=50, timeout=5, policy-regex=新|狮|SG|Singapore|新加坡
+美国节点 = url-test, tag=美国节点, url=http://www.gstatic.com/generate_204, interval=600, tolerance=50, timeout=5, policy-regex=美|US|States|American|美国
+韩国节点 = url-test, tag=韩国节点, url=http://www.gstatic.com/generate_204, interval=600, tolerance=50, timeout=5, policy-regex=KR|Korea|韩国|首尔|🇰🇷
 
-US1 = vmess, us1.yourserver.com, 443, username=xxx, password=xxx, tls=true
-US2 = vmess, us2.yourserver.com, 443, username=xxx, password=xxx, tls=true
-
-KR1 = vmess, kr1.yourserver.com, 443, username=xxx, password=xxx, tls=true
-KR2 = vmess, kr2.yourserver.com, 443, username=xxx, password=xxx, tls=true
-
-SG1 = vmess, sg1.yourserver.com, 443, username=xxx, password=xxx, tls=true
-SG2 = vmess, sg2.yourserver.com, 443, username=xxx, password=xxx, tls=true
-
-JP1 = vmess, jp1.yourserver.com, 443, username=xxx, password=xxx, tls=true
-JP2 = vmess, jp2.yourserver.com, 443, username=xxx, password=xxx, tls=true
-
-# ===================== 节点结束 =====================
+自动选择 = url-test, tag=自动选择, url=http://www.gstatic.com/generate_204, interval=300, tolerance=50, timeout=5, policy-regex=^(?!.*(故障|过期|剩余|到期)).*$
 
 [Proxy Group]
-Proxy = select, DIRECT, HK Group, US Group, KR Group, SG Group, JP Group
-HK Group = select, HK1, HK2
-US Group = select, US1, US2
-KR Group = select, KR1, KR2
-SG Group = select, SG1, SG2
-JP Group = select, JP1, JP2
-
-# 可选：为常用组添加 url-test 自动选择（延迟测试）
-# HK Group-auto = url-test, HK1, HK2, url=http://www.gstatic.com/generate_204, interval=300
+全球加速 = select, 自动选择, 香港节点, 台湾节点, 日本节点, 狮城节点, 美国节点, 韩国节点, tag=全球加速
+苹果服务 = select, DIRECT, 自动选择, 香港节点, 台湾节点, 狮城节点, 日本节点, 美国节点, 韩国节点, tag=苹果服务
+哔哩哔哩 = select, DIRECT, 自动选择, 香港节点, 台湾节点, 狮城节点, 日本节点, 美国节点, 韩国节点, tag=哔哩哔哩
 
 [Rule]
-# 1. 微信全直连（包含支付、小程序等）
-DOMAIN-SUFFIX, weixin.qq.com, DIRECT
-DOMAIN-SUFFIX, wx.qq.com, DIRECT
-DOMAIN-SUFFIX, mmstat.com, DIRECT
-DOMAIN-KEYWORD, wechat, DIRECT
-DOMAIN-KEYWORD, wxpay, DIRECT
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/WeChat/WeChat.list,DIRECT
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Apple/Apple.list,苹果服务
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/BiliBili/BiliBili.list,哔哩哔哩
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/ChinaMedia/ChinaMedia.list,DIRECT
 
-# 2. 苹果全家桶直连
-DOMAIN-SUFFIX, apple.com, DIRECT
-DOMAIN-SUFFIX, icloud.com, DIRECT
-DOMAIN-SUFFIX, icloud-content.com, DIRECT
-DOMAIN-SUFFIX, me.com, DIRECT
-DOMAIN-SUFFIX, mzstatic.com, DIRECT
-DOMAIN-SUFFIX, cdn-apple.com, DIRECT
-DOMAIN-SUFFIX, itunes.com, DIRECT
-DOMAIN-SUFFIX, appstore.com, DIRECT
+OR,((DOMAIN-KEYWORD,wogg),(DOMAIN-SUFFIX,iios.club),(DOMAIN-SUFFIX,shuibeng.dpdns.org)),DIRECT
 
-# 3. 喜马拉雅FM / Himalaya → 香港
-DOMAIN-SUFFIX, ximalaya.com, HK Group
-DOMAIN-SUFFIX, himalaya.com, HK Group
-DOMAIN-SUFFIX, xmcdn.com, HK Group
-DOMAIN-SUFFIX, xmcnd.com, HK Group
-DOMAIN-SUFFIX, xdcdn.com, HK Group
-DOMAIN-KEYWORD, ximalaya, HK Group
+OR,((DOMAIN-SUFFIX,vercel.app),(DOMAIN-KEYWORD,haijiao),(DOMAIN-SUFFIX,openai.com),(DOMAIN-SUFFIX,openaiusercontent.com),(DOMAIN-SUFFIX,chatgpt.com),(DOMAIN-SUFFIX,gemini.google.com),(DOMAIN-SUFFIX,googleapis.com),(DOMAIN-SUFFIX,anthropic.com),(DOMAIN-SUFFIX,claude.ai),(DOMAIN-SUFFIX,perplexity.ai),(DOMAIN-SUFFIX,grok.x.ai),(DOMAIN-SUFFIX,x.ai),(DOMAIN-KEYWORD,grok)),美国节点
 
-# 4. Spotify → 香港
-DOMAIN-SUFFIX, spotify.com, HK Group
-DOMAIN-SUFFIX, scdn.co, HK Group
-DOMAIN-SUFFIX, spoti.fi, HK Group
-DOMAIN-SUFFIX, spotilocal.com, HK Group
+OR,((DOMAIN-SUFFIX,deepseek.com),(DOMAIN-KEYWORD,deepseek),(DOMAIN-SUFFIX,qwen.ai),(DOMAIN-SUFFIX,tongyi.aliyun.com),(DOMAIN-SUFFIX,wenxin.baidu.com)),DIRECT
 
-# 5. YouTube/Google/Twitter/X → 美国
-DOMAIN-SUFFIX, youtube.com, US Group
-DOMAIN-SUFFIX, ytimg.com, US Group
-DOMAIN-SUFFIX, youtu.be, US Group
-DOMAIN-SUFFIX, ggpht.com, US Group
-DOMAIN-SUFFIX, google.com, US Group
-DOMAIN-SUFFIX, googleapis.com, US Group
-DOMAIN-SUFFIX, gstatic.com, US Group
-DOMAIN-SUFFIX, googleusercontent.com, US Group
-DOMAIN-SUFFIX, twitter.com, US Group
-DOMAIN-SUFFIX, t.co, US Group
-DOMAIN-SUFFIX, twimg.com, US Group
-DOMAIN-SUFFIX, x.com, US Group
-DOMAIN-SUFFIX, x.ai, US Group
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/GitHub/GitHub.list,香港节点
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Google/Google.list,美国节点
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/YouTube/YouTube.list,美国节点
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Instagram/Instagram.list,韩国节点
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Facebook/Facebook.list,韩国节点
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Twitter/Twitter.list,美国节点
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Telegram/Telegram.list,狮城节点
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/TikTok/TikTok.list,日本节点
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/Spotify/Spotify.list,香港节点
 
-# 6. 非大陆AI服务 → 美国
-DOMAIN-SUFFIX, openai.com, US Group
-DOMAIN-SUFFIX, chatgpt.com, US Group
-DOMAIN-SUFFIX, api.openai.com, US Group
-DOMAIN-SUFFIX, oaiusercontent.com, US Group
-DOMAIN-SUFFIX, anthropic.com, US Group
-DOMAIN-SUFFIX, claude.ai, US Group
-DOMAIN-SUFFIX, gemini.google.com, US Group
-DOMAIN-SUFFIX, ai.google.dev, US Group
-DOMAIN-KEYWORD, openai, US Group
-DOMAIN-KEYWORD, claude, US Group
-DOMAIN-KEYWORD, gemini, US Group
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/GlobalMedia/GlobalMedia.list,全球加速
+GEOIP,CN,DIRECT
+FINAL,全球加速
 
-# 7. Instagram/Threads/Facebook → 韩国
-DOMAIN-SUFFIX, instagram.com, KR Group
-DOMAIN-SUFFIX, instagramusercontent.com, KR Group
-DOMAIN-SUFFIX, cdninstagram.com, KR Group
-DOMAIN-SUFFIX, threads.net, KR Group
-DOMAIN-SUFFIX, facebook.com, KR Group
-DOMAIN-SUFFIX, fb.com, KR Group
-DOMAIN-SUFFIX, fbcdn.net, KR Group
-DOMAIN-SUFFIX, meta.com, KR Group
-DOMAIN-KEYWORD, instagram, KR Group
+[Rewrite]
+^https?://(www\.)?g\.cn$ https://www.google.com 302
+^https?://(www\.)?google\.cn$ https://www.google.com 302
 
-# 8. Telegram → 新加坡
-DOMAIN-SUFFIX, telegram.org, SG Group
-DOMAIN-SUFFIX, t.me, SG Group
-DOMAIN-SUFFIX, tdesktop.com, SG Group
-DOMAIN-SUFFIX, telegra.ph, SG Group
-
-# 9. TikTok → 日本
-DOMAIN-SUFFIX, tiktok.com, JP Group
-DOMAIN-SUFFIX, tiktokcdn.com, JP Group
-DOMAIN-SUFFIX, tiktokv.com, JP Group
-DOMAIN-SUFFIX, byteoversea.com, JP Group
-DOMAIN-SUFFIX, musical.ly, JP Group
-DOMAIN-KEYWORD, tiktok, JP Group
-
-# 10. 轻量去广告
-DOMAIN-KEYWORD, ads, REJECT
-DOMAIN-KEYWORD, adserver, REJECT
-DOMAIN-SUFFIX, doubleclick.net, REJECT
-DOMAIN-SUFFIX, googlesyndication.com, REJECT
-
-# 11. 中国大陆直连
-GEOIP, CN, DIRECT
-DOMAIN-SUFFIX, cn, DIRECT
-DOMAIN-SUFFIX, taobao.com, DIRECT
-DOMAIN-SUFFIX, jd.com, DIRECT
-DOMAIN-SUFFIX, alipay.com, DIRECT
-DOMAIN-SUFFIX, 163.com, DIRECT
-DOMAIN-SUFFIX, qq.com, DIRECT
-
-# 12. 兜底规则（未匹配的走主选择组）
-FINAL, Proxy
+[MITM]
+hostname = *.google.cn, *.gstatic.com, *.google.com, *.googleapis.com
